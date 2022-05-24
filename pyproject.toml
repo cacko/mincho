@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "mincho"
+version = "0.1.0"
+description = ""
+authors = ["cackoe <alex@cacko.net>"]
+
+[[tool.poetry.source]]
+name = "cacko"
+secondary = true
+url = "https://pypi.cacko.net/simple/"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+rumps = "^0.4.0"
+py2app = "^0.28"
+jsonrpcclient = "^4.0.2"
+pyzmq = "^23.0.0"
+
+[tool.poetry.dev-dependencies]
+flake8 = "^4.0.1"
+autopep8 = "^1.6.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
