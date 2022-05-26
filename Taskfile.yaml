@@ -10,3 +10,16 @@ tasks:
     cmds:
       - poetry run python -m mincho
     silent: true
+
+  build:
+    cmds:
+      - rm -rf build 
+      - rm -rf dist
+      - rm -rf .eggs
+      - poetry run python setup.py py2app
+
+  install:
+    cmds:
+      - killall Mincho || true
+      - task: build
+      - mv dist/Mincho.app /Applications

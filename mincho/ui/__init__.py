@@ -55,7 +55,9 @@ class MinchoApp(rumps.App):
                 None,
             ]
         )
-        self.__config_path = Path(environ.get("MINCHO_CONFIG", "."))
+        self.quit_button = None
+        self.__config_path = Path(environ.get(
+            "MINCHO_CONFIG", "/Users/jago/.uselethminer/config"))
         self.icon = self.get_icon(Icon.OFF)
         self.menu_item(Action.START).hide()
         rpc = Client(self)
@@ -116,6 +118,10 @@ class MinchoApp(rumps.App):
         self.queue.put_nowait(Request(
             method=Method.START,
         ))
+
+    @rumps.clicked("Quit")
+    def onQuit(self, sender):
+        rumps.quit_application()
 
     @rumps.timer(5)
     def updateStatus(self, sender):
