@@ -8,5 +8,5 @@ vars:
 tasks:
   default:
     cmds:
-      - poetry run python app.py
+      - poetry run python -m mincho
     silent: true
