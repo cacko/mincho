@@ -18,6 +18,10 @@ from os import environ
 class Icon(Enum):
     ON = 'on.png'
     OFF = 'off.png'
+    DEFAULT = 'default.png'
+    CPUPLUS = 'cpuplus.png'
+    MAX = 'max.png'
+    QUIT = 'quit.png'
 
 
 class Action(Enum):
@@ -46,12 +50,12 @@ class MinchoApp(rumps.App):
         super(MinchoApp, self).__init__(
             name="Mincho",
             menu=[
-                MenuItem("Start"),
-                MenuItem("Stop"),
+                MenuItem("Start", icon=self.get_icon(Icon.ON)),
+                MenuItem("Stop", icon=self.get_icon(Icon.OFF)),
                 None,
-                MenuItem("Default"),
-                MenuItem("CPU+"),
-                MenuItem("Max"),
+                MenuItem("Default", icon=self.get_icon(Icon.DEFAULT)),
+                MenuItem("CPU+", icon=self.get_icon(Icon.CPUPLUS)),
+                MenuItem("Max", icon=self.get_icon(Icon.MAX)),
                 None,
             ]
         )
