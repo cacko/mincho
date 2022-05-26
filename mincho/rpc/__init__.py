@@ -8,6 +8,7 @@ from mincho import log
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json, Undefined
 from enum import Enum
+from math import ceil
 
 
 class Method(Enum):
@@ -66,6 +67,7 @@ class Client:
     __wstream: StreamWriter = None
     input: Queue = None
     __connected: bool = False
+    __connect_attempt: int = 0
 
     def __init__(self, app) -> None:
         self.eventLoop = asyncio.new_event_loop()
@@ -76,15 +78,16 @@ class Client:
         self.eventLoop.create_task(self.miner_processor())
         self.eventLoop.run_forever()
 
-    async def connect(self, reconnect=False):
+    async def connect(self):
         try:
             if not self.__connected:
                 self.__rstream, self.__wstream = await asyncio.open_connection(
                     '127.0.0.1', 3326)
                 self.__connected = True
+                self.__connect_attempt = 0
                 log.debug(f"connected {self.__rstream}")
         except Exception:
-            print("recoonect fail")
+            print("coonect fail")
 
     async def miner_processor(self):
         while True:
@@ -108,3 +111,13 @@ class Client:
         except:
             self.__connected = False
             self.app.status_icon(False)
+            timeout = 1 + ceil(self.__connect_attempt / 10)
+            dots = 0
+            while timeout > 0:
+                timeout -= 0.2
+                if dots == 3:
+                    dots = 0
+                else:
+                    dots += 1
+                self.app.title = f"Reconnecting{'.'*dots}"
+                asyncio.sleep(0.2)
