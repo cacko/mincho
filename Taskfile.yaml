@@ -22,4 +22,5 @@ tasks:
     cmds:
       - killall Mincho || true
       - task: build
+      - rm -rf /Applications/Mincho.app
       - mv dist/Mincho.app /Applications
