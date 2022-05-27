@@ -1,4 +1,4 @@
-import re
+from time import sleep
 from typing import Optional
 from jsonrpcclient import request_json
 import asyncio
@@ -78,14 +78,18 @@ class Client:
         self.eventLoop.create_task(self.miner_processor())
         self.eventLoop.run_forever()
 
+    @property
+    def connected(self) -> bool:
+        return self.__connected
+
     async def connect(self):
         try:
             if not self.__connected:
                 self.__rstream, self.__wstream = await asyncio.open_connection(
                     '127.0.0.1', 3326)
                 self.__connected = True
-                self.__connect_attempt = 0
-                log.debug(f"connected {self.__rstream}")
+                if self.input.empty():
+                    self.input.put_nowait(Request(method=Method.STATUS))
         except Exception:
             print("coonect fail")
 
@@ -111,13 +115,9 @@ class Client:
         except:
             self.__connected = False
             self.app.status_icon(False)
+            self.__connect_attempt += 1
             timeout = 1 + ceil(self.__connect_attempt / 10)
-            dots = 0
+            self.app.title = f"Connecting ({self.__connect_attempt})"
             while timeout > 0:
                 timeout -= 0.2
-                if dots == 3:
-                    dots = 0
-                else:
-                    dots += 1
-                self.app.title = f"Reconnecting{'.'*dots}"
-                asyncio.sleep(0.2)
+                sleep(0.2)

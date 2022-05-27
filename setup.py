@@ -1,16 +1,11 @@
 from setuptools import setup
 
+
 APP = ['app.py']
 DATA_FILES = []
 OPTIONS = {
-    'argv_emulation': True,
-    'plist': {
-        'LSUIElement': True,
-    },
-    'iconfile':'icon.icns',
-    'packages': ['rumps'],
+    'iconfile': 'icon.icns',
 }
-
 setup(
     app=APP,
     name="Mincho",

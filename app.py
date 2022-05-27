@@ -1,3 +1,3 @@
-from mincho.ui import MinchoApp
+from mincho.ui.app import MinchoApp
 
 MinchoApp().run()
