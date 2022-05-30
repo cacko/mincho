@@ -14,14 +14,14 @@ from mincho.ui.models import (
     ActionItem,
     Icon,
     Preset,
-    ToggleAction
+    ToggleAction,
 )
 
 
 class MinchoApp(rumps.App):
 
     queue: Queue = None
-    __connected: bool = False
+    __connected: bool = None
     __config_path: Path = None
     __rpc_client: Client = None
 
@@ -41,6 +41,7 @@ class MinchoApp(rumps.App):
         )
         self.__config_path = Path(environ.get(
             "MINCHO_CONFIG", "/Users/jago/.uselethminer/config"))
+        ActionItem.stop.hide()
         ActionItem.start.hide()
         self.__rpc_client = Client(self)
         self.queue = self.__rpc_client.input
@@ -95,7 +96,7 @@ class MinchoApp(rumps.App):
     def onQuit(self, sender):
         rumps.quit_application()
 
-    @rumps.timer(5)
+    @rumps.timer(10)
     def updateStatus(self, sender):
         if self.__rpc_client.connected:
             self.queue.put_nowait(
@@ -112,8 +113,8 @@ class MinchoApp(rumps.App):
             self.__connected = status
             icon = Icon.ON if status else Icon.OFF
             self.icon = icon.value
-            ToggleAction.start.toggle()
-            ToggleAction.stop.toggle()
+            ToggleAction.start.toggle(not self.__connected)
+            ToggleAction.stop.toggle(self.__connected)
             if self.__connected:
                 try:
                     getattr(ActionItem, self.active_preset.value).state = 1

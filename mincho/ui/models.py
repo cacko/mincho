@@ -56,9 +56,8 @@ class ActionItem(MenuItem, metaclass=ActionItemMeta):
 class ToggleAction(ActionItem):
     _states = ['hide', 'show']
 
-    def toggle(self):
-        getattr(self, self._states[int(not self.hidden)])()
-
+    def toggle(self, state: bool):
+        getattr(self, self._states[int(state)])()
 
 class Preset(Enum):
     DEFAULT = "default"

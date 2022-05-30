@@ -113,6 +113,7 @@ class Client:
             self.input.task_done()
             self.app.onResult(req.method, msg)
         except:
+            self.__wstream.close()
             self.__connected = False
             self.app.status_icon(False)
             self.__connect_attempt += 1
