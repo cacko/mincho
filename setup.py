@@ -5,6 +5,11 @@ APP = ['app.py']
 DATA_FILES = []
 OPTIONS = {
     'iconfile': 'icon.icns',
+    'argv_emulation': True,
+    'plist': {
+        'LSUIElement': True,
+    },
+    'packages': ['rumps'],
 }
 setup(
     app=APP,
