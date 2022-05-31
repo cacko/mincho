@@ -17,6 +17,7 @@ dataclasses-json = "^0.5.7"
 py2app = "^0.28.2"
 cachable = "^0.3.2"
 toml = "^0.10.2"
+arrow = "^1.2.2"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"

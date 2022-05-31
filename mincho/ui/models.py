@@ -4,7 +4,8 @@ from enum import Enum
 from dataclasses_json import dataclass_json, Undefined
 from dataclasses import dataclass
 from typing import Optional
-
+from datetime import datetime, timezone
+import arrow
 
 class Icon(Enum):
     ON = 'on.png'
@@ -13,6 +14,11 @@ class Icon(Enum):
     CPUPLUS = 'cpuplus.png'
     MAX = 'max.png'
     QUIT = 'quit.png'
+    WALLET = 'wallet.png'
+    LAST_SEEN = 'last_seen.png'
+    WORKER = 'worker.png'
+    POWERPLUG = 'powerplug.png'
+    USD = 'usd.png'
 
     def __new__(cls, *args):
         icons_path: Path = Path(__file__).parent / "icons"
@@ -51,6 +57,22 @@ class ActionItemMeta(type):
     def max(cls) -> 'ActionItem':
         return cls("maxx", "Max", icon=Icon.MAX.value)
 
+    @property
+    def usd_per_minute(cls) -> 'StatItem':
+        return cls("usd_per_minute", "-", icon=Icon.USD.value)
+
+    @property
+    def last_seen(cls) -> 'StatItem':
+        return cls("last_seen", "-", icon=Icon.LAST_SEEN.value)
+
+    @property
+    def active_workers(cls) -> 'StatItem':
+        return cls("active_worker", "-", icon=Icon.WORKER.value)
+
+    @property
+    def current_hashrate(cls) -> 'StatItem':
+        return cls("current_hashrate", "-", icon=Icon.POWERPLUG.value)
+
 
 class ActionItem(MenuItem, metaclass=ActionItemMeta):
     pass
@@ -61,6 +83,27 @@ class ToggleAction(ActionItem):
 
     def toggle(self, state: bool):
         getattr(self, self._states[int(state)])()
+
+
+class StatItem(ActionItem):
+
+    def number(self, value=None):
+        self.title = f"Workers: {value}"
+        self.set_callback(lambda x: True)
+
+    def relative_time(self, value=None):
+        self.title = arrow.get(value).humanize(arrow.utcnow())
+        self.set_callback(lambda x: True)
+
+
+    def money(self, value=None):
+        self.title = f"{value:.5f}$"
+        self.set_callback(lambda x: True)
+
+    def hashrate(self, value=None):
+        value = value / 1000000
+        self.title = f"{value:.3f} MH/s"
+        self.set_callback(lambda x: True)
 
 
 class Preset(Enum):

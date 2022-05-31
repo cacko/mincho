@@ -15,6 +15,7 @@ from mincho.ui.models import (
     BarStats,
     Icon,
     Preset,
+    StatItem,
     ToggleAction,
 )
 from mincho.api.client import (
@@ -25,7 +26,6 @@ from mincho.api.models import (
     Method as APIMethod
 )
 from mincho import app_config
-
 
 
 class MinchoApp(rumps.App):
@@ -43,6 +43,11 @@ class MinchoApp(rumps.App):
         super(MinchoApp, self).__init__(
             name="Mincho",
             menu=[
+                StatItem.active_workers,
+                StatItem.last_seen,
+                StatItem.usd_per_minute,
+                StatItem.current_hashrate,
+                None,
                 ToggleAction.start,
                 ToggleAction.stop,
                 None,
@@ -146,7 +151,6 @@ class MinchoApp(rumps.App):
                     print(e)
 
     def on_status(self, res: Status):
-        log.debug(res)
         self.status_icon(res.result[0].connected)
         self.barStats.local_hr = sum([r.hashrate for r in res.result]) / 100000
         self.barStats.threads = sum([r.threads_current for r in res.result])
@@ -161,26 +165,10 @@ class MinchoApp(rumps.App):
         if self.active_preset != Preset.DEFAULT:
             self.change_preset(Preset.DEFAULT)
 
-    def on_api_response(self, resp):
+    def on_api_response(self, resp: CurrentStats):
         self.apiStats = resp
-        print(resp)
         self.barStats.remote_hr = resp.data.averageHashrate / 1000000
-
-    # @rumps.clicked("Show all area")
-    # def show_area(self, sender):
-    #     """ clicked "Show all area button." """
-    #     with requests.Session() as s:
-    #         area_list = self.get_monitor_area(s)
-
-    #         show_window = rumps.Window(
-    #             message='All area name',
-    #             title='Area List',
-    #             default_text=area_list,
-    #             ok=None,
-    #             dimensions=(300, 300)
-    #         )
-
-    #         show_window.run()
-
-        # self.site_name = response.text
-        # self.refresh_status()
+        StatItem.active_workers.number(self.apiStats.data.activeWorkers)
+        StatItem.last_seen.relative_time(self.apiStats.data.lastSeen)
+        StatItem.usd_per_minute.money(self.apiStats.data.usdPerMin)
+        StatItem.current_hashrate.hashrate(resp.data.currentHashrate)
