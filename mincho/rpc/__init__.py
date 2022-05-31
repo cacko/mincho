@@ -88,8 +88,6 @@ class Client:
                 self.__rstream, self.__wstream = await asyncio.open_connection(
                     '127.0.0.1', 3326)
                 self.__connected = True
-                if self.input.empty():
-                    self.input.put_nowait(Request(method=Method.STATUS))
         except Exception:
             print("coonect fail")
 

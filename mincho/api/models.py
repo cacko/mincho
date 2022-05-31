@@ -1,8 +1,13 @@
 from dataclasses_json import Undefined, dataclass_json
 from dataclasses import dataclass
+from enum import Enum
 
 
-@dataclass_json(Undefined.EXCLUDE)
+class Method(Enum):
+    STATS = 'https://api.ethermine.org/miner/<client_id>/currentStats'
+
+
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class StatsData:
     time: int
@@ -20,7 +25,7 @@ class StatsData:
     btcPerMin: float
 
 
-@dataclass_json(Undefined.EXCLUDE)
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class CurrentStats:
     status: str
