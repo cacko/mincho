@@ -127,3 +127,11 @@ class MinchoApp(rumps.App):
         hash_rate = [f"{r.hashrate / 100000:.2f}" for r in res.result]
         threads = [f"{r.threads_current}" for r in res.result]
         self.title = f"HR: {' '.join(hash_rate)} | TH: {' '.join(threads)}"
+
+    @rumps.events.on_screen_sleep
+    def sleep(self):
+        self.change_preset(Preset.MAXX)
+
+    @rumps.events.on_screen_wake
+    def wake(self):
+        self.change_preset(Preset.DEFAULT)

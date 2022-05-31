@@ -11,7 +11,7 @@ url = "https://pypi.cacko.net/simple/"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
-rumps = "^0.4.0"
+rumps = "^0.4.7"
 jsonrpcclient = "^4.0.2"
 dataclasses-json = "^0.5.7"
 py2app = "^0.28.2"
