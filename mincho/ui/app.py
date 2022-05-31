@@ -24,6 +24,8 @@ from mincho.api.models import (
     CurrentStats,
     Method as APIMethod
 )
+from mincho import app_config
+
 
 
 class MinchoApp(rumps.App):
@@ -52,8 +54,7 @@ class MinchoApp(rumps.App):
             quit_button=None
         )
         self.barStats = BarStats()
-        self.__config_path = Path(environ.get(
-            "MINCHO_CONFIG", "/Users/jago/.uselethminer/config"))
+        self.__config_path = Path(app_config.mincho_config)
         self.menu.setAutoenablesItems = False
         ActionItem.stop.hide()
         ActionItem.start.hide()
