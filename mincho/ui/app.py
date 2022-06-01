@@ -47,14 +47,14 @@ class MinchoApp(rumps.App):
                 StatItem.last_seen,
                 StatItem.usd_per_minute,
                 StatItem.current_hashrate,
-                None,
-                ToggleAction.start,
-                ToggleAction.stop,
+
                 None,
                 ActionItem.default,
                 ActionItem.cpuplus,
                 ActionItem.max,
                 None,
+                ToggleAction.start,
+                ToggleAction.stop,
             ],
             quit_button=None
         )

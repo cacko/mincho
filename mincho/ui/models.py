@@ -7,6 +7,7 @@ from typing import Optional
 from datetime import datetime, timezone
 import arrow
 
+
 class Icon(Enum):
     ON = 'on.png'
     OFF = 'off.png'
@@ -19,7 +20,10 @@ class Icon(Enum):
     WORKER = 'worker.png'
     POWERPLUG = 'powerplug.png'
     USD = 'usd.png'
-
+    ESCAPE = 'escape.png'
+    PROBE = 'probe.png'
+    POWER = 'power.png'
+    POWEROFF = 'poweroff.png'
     def __new__(cls, *args):
         icons_path: Path = Path(__file__).parent / "icons"
         value = icons_path / args[0]
@@ -39,11 +43,11 @@ class ActionItemMeta(type):
 
     @property
     def start(cls) -> 'ActionItem':
-        return cls("start", "Start", icon=Icon.ON.value)
+        return cls("start", "Start", icon=Icon.POWER.value)
 
     @property
     def stop(cls) -> 'ActionItem':
-        return cls("stop", "Stop", icon=Icon.OFF.value)
+        return cls("stop", "Stop", icon=Icon.POWEROFF.value)
 
     @property
     def default(cls) -> 'ActionItem':
@@ -94,7 +98,6 @@ class StatItem(ActionItem):
     def relative_time(self, value=None):
         self.title = arrow.get(value).humanize(arrow.utcnow())
         self.set_callback(lambda x: True)
-
 
     def money(self, value=None):
         self.title = f"{value:.5f}$"
