@@ -1,11 +1,21 @@
+from sys import prefix
 from rumps import MenuItem
 from pathlib import Path
 from enum import Enum
 from dataclasses_json import dataclass_json, Undefined
 from dataclasses import dataclass
 from typing import Optional
-from datetime import datetime, timezone
 import arrow
+from mincho.core.string import name_to_code
+
+
+class Label(Enum):
+    START = 'Start'
+    STOP = 'Stop'
+    DEFAULT = 'Default'
+    CPUPLUS = 'CPU+'
+    MAX = 'Max'
+    QUIT = 'Quit'
 
 
 class Icon(Enum):
@@ -24,6 +34,8 @@ class Icon(Enum):
     PROBE = 'probe.png'
     POWER = 'power.png'
     POWEROFF = 'poweroff.png'
+    THREADS = "threads.png"
+
     def __new__(cls, *args):
         icons_path: Path = Path(__file__).parent / "icons"
         value = icons_path / args[0]
@@ -43,23 +55,23 @@ class ActionItemMeta(type):
 
     @property
     def start(cls) -> 'ActionItem':
-        return cls("start", "Start", icon=Icon.POWER.value)
+        return cls("start", Label.START.value, icon=Icon.POWER.value)
 
     @property
     def stop(cls) -> 'ActionItem':
-        return cls("stop", "Stop", icon=Icon.POWEROFF.value)
+        return cls("stop", Label.STOP.value, icon=Icon.POWEROFF.value)
 
     @property
     def default(cls) -> 'ActionItem':
-        return cls("default", "Default", icon=Icon.DEFAULT.value)
+        return cls("default", Label.DEFAULT.value, icon=Icon.DEFAULT.value)
 
     @property
     def cpuplus(cls) -> 'ActionItem':
-        return cls("cpuplsu", "CPU+", icon=Icon.CPUPLUS.value)
+        return cls("cpuplsu", Label.CPUPLUS.value, icon=Icon.CPUPLUS.value)
 
     @property
     def max(cls) -> 'ActionItem':
-        return cls("maxx", "Max", icon=Icon.MAX.value)
+        return cls("maxx", Label.MAX.value, icon=Icon.MAX.value)
 
     @property
     def usd_per_minute(cls) -> 'StatItem':
@@ -71,11 +83,19 @@ class ActionItemMeta(type):
 
     @property
     def active_workers(cls) -> 'StatItem':
-        return cls("active_worker", "-", icon=Icon.WORKER.value)
+        return cls("active_worker", "-", prefix="Workers", icon=Icon.WORKER.value)
 
     @property
     def current_hashrate(cls) -> 'StatItem':
         return cls("current_hashrate", "-", icon=Icon.POWERPLUG.value)
+
+    @property
+    def threads(cls) -> 'StatItem':
+        return cls("threads", "-", prefix="Threads", icon=Icon.THREADS.value)
+
+    @property
+    def quit(cls) -> 'ActionItem':
+        return cls("quit", Label.QUIT.value, icon=Icon.QUIT.value)
 
 
 class ActionItem(MenuItem, metaclass=ActionItemMeta):
@@ -91,8 +111,17 @@ class ToggleAction(ActionItem):
 
 class StatItem(ActionItem):
 
+    prefix: str = None
+
+    def __init__(self, title, prefix: str = None, **kwargs):
+        self.prefix = prefix
+        super().__init__(title, **kwargs)
+
     def number(self, value=None):
-        self.title = f"Workers: {value}"
+        if prefix:
+            self.title = f"{self.prefix}: {value}"
+        else:
+            self.template = f"{value}"
         self.set_callback(lambda x: True)
 
     def relative_time(self, value=None):
@@ -119,15 +148,14 @@ class Preset(Enum):
 @dataclass
 class BarStats:
     local_hr: Optional[float] = None
-    threads: Optional[int] = None
+    preset: Optional[str] = "default"
     remote_hr: Optional[float] = None
 
     @property
     def display(self):
-        parts = filter(lambda x: x[1], [
-            ("HR", f"{self.local_hr:.2f}" if self.local_hr else None),
-            ("TH", f"{self.threads:.0f}" if self.threads else None),
-            ("RHR", f"{self.remote_hr:.2f}" if self.remote_hr else None),
+        parts = filter(None, [
+            f"{name_to_code(self.preset).upper()}",
+            f"{self.local_hr:.2f}MH/s" if self.local_hr else None,
+            f"{self.remote_hr:.2f}MH/s" if self.remote_hr else None,
         ])
-
-        return " | ".join([": ".join(p) for p in parts])
+        return " | ".join(parts)

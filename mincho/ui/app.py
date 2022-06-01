@@ -14,6 +14,7 @@ from mincho.ui.models import (
     ActionItem,
     BarStats,
     Icon,
+    Label,
     Preset,
     StatItem,
     ToggleAction,
@@ -47,7 +48,7 @@ class MinchoApp(rumps.App):
                 StatItem.last_seen,
                 StatItem.usd_per_minute,
                 StatItem.current_hashrate,
-
+                StatItem.threads,
                 None,
                 ActionItem.default,
                 ActionItem.cpuplus,
@@ -55,6 +56,7 @@ class MinchoApp(rumps.App):
                 None,
                 ToggleAction.start,
                 ToggleAction.stop,
+                ActionItem.quit
             ],
             quit_button=None
         )
@@ -92,31 +94,31 @@ class MinchoApp(rumps.App):
         self.__config_path.symlink_to(new_config)
         self.rpc_queue.put_nowait(Request(method=RPCMethod.SHUTDOWN))
 
-    @rumps.clicked("Default")
+    @rumps.clicked(Label.DEFAULT.value)
     def onDefault(self, sender):
         self.change_preset(Preset.DEFAULT)
 
-    @rumps.clicked("CPU+")
+    @rumps.clicked(Label.CPUPLUS.value)
     def onCpu(self, sender):
         self.change_preset(Preset.CPUPLUS)
 
-    @rumps.clicked("Max")
+    @rumps.clicked(Label.MAX.value)
     def onMax(self, sender):
         self.change_preset(Preset.MAXX)
 
-    @rumps.clicked("Stop")
+    @rumps.clicked(Label.STOP.value)
     def onStart(self, sender):
         self.rpc_queue.put_nowait(Request(
             method=RPCMethod.STOP,
         ))
 
-    @rumps.clicked("Start")
+    @rumps.clicked(Label.START.value)
     def onStop(self, sender):
         self.rpc_queue.put_nowait(Request(
             method=RPCMethod.START,
         ))
 
-    @rumps.clicked("Quit")
+    @rumps.clicked(Label.QUIT.value)
     def onQuit(self, sender):
         rumps.quit_application()
 
@@ -153,7 +155,8 @@ class MinchoApp(rumps.App):
     def on_status(self, res: Status):
         self.status_icon(res.result[0].connected)
         self.barStats.local_hr = sum([r.hashrate for r in res.result]) / 100000
-        self.barStats.threads = sum([r.threads_current for r in res.result])
+        self.barStats.preset = self.active_preset.value
+        StatItem.threads.number(sum([r.threads_current for r in res.result]))
 
     @rumps.events.on_screen_sleep
     def sleep(self):
