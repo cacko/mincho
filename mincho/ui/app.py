@@ -7,11 +7,10 @@ from mincho.rpc import (
     Request,
     Status
 )
-from mincho import log
 from pathlib import Path
-from os import environ
 from mincho.ui.models import (
     ActionItem,
+    ApiStats,
     BarStats,
     Icon,
     Label,
@@ -23,7 +22,6 @@ from mincho.api.client import (
     Client as APIClient
 )
 from mincho.api.models import (
-    CurrentStats,
     Method as APIMethod
 )
 from mincho import app_config
@@ -37,7 +35,7 @@ class MinchoApp(rumps.App):
     __config_path: Path = None
     __rpc_client: RPCClient = None
     __api_client: APIClient = None
-    apiStats: CurrentStats = None
+    apiStats: ApiStats = None
     barStats: BarStats = None
 
     def __init__(self):
@@ -168,10 +166,10 @@ class MinchoApp(rumps.App):
         if self.active_preset != Preset.DEFAULT:
             self.change_preset(Preset.DEFAULT)
 
-    def on_api_response(self, resp: CurrentStats):
-        self.apiStats = resp
-        self.barStats.remote_hr = resp.data.averageHashrate / 1000000
-        StatItem.active_workers.number(self.apiStats.data.activeWorkers)
-        StatItem.last_seen.relative_time(self.apiStats.data.lastSeen)
-        StatItem.usd_per_minute.money(self.apiStats.data.usdPerMin)
-        StatItem.current_hashrate.hashrate(resp.data.currentHashrate)
+    def on_api_response(self, resp: ApiStats):
+        self.apiStats: ApiStats = resp
+        self.barStats.remote_hr = resp.averageHashrate / 1000000
+        StatItem.active_workers.number(self.apiStats.activeWorkers)
+        StatItem.last_seen.relative_time(self.apiStats.lastSeen)
+        StatItem.usd_per_minute.money(self.apiStats.usdPerMin)
+        StatItem.current_hashrate.hashrate(resp.currentHashrate)

@@ -9,7 +9,7 @@ OPTIONS = {
     'plist': {
         'LSUIElement': True,
     },
-    'packages': ['rumps', 'cachable', 'dataclasses_json', 'jsonrpcclient', 'requests', 'arrow'],
+    'packages': ['rumps', 'cachable', 'dataclasses_json', 'jsonrpcclient', 'requests', 'arrow', 'tld'],
 }
 setup(
     app=APP,

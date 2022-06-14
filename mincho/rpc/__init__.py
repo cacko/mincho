@@ -107,7 +107,6 @@ class Client:
             self.__wstream.write(payload.encode())
             await self.__wstream.drain()
             msg = await self.__rstream.readline()
-            log.debug(msg)
             self.input.task_done()
             self.app.onResult(req.method, msg)
         except:
@@ -120,3 +119,4 @@ class Client:
             while timeout > 0:
                 timeout -= 0.2
                 sleep(0.2)
+            await self.connect()

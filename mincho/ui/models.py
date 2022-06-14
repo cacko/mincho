@@ -1,3 +1,4 @@
+from re import U
 from sys import prefix
 from rumps import MenuItem
 from pathlib import Path
@@ -42,6 +43,17 @@ class Icon(Enum):
         obj = object.__new__(cls)
         obj._value_ = value.as_posix()
         return obj
+
+
+@dataclass_json(undefined=Undefined.EXCLUDE)
+@dataclass
+class ApiStats:
+    activeWorkers: int
+    lastSeen: int
+    usdPerMin: float
+    averageHashrate: float
+    currentHashrate: float
+    pool: str
 
 
 class ActionItemMeta(type):
@@ -129,7 +141,7 @@ class StatItem(ActionItem):
         self.set_callback(lambda x: True)
 
     def money(self, value=None):
-        self.title = f"{value:.5f}$"
+        self.title = F"{float(value):.5f}$"
         self.set_callback(lambda x: True)
 
     def hashrate(self, value=None):

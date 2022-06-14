@@ -3,7 +3,7 @@ from queue import Queue
 from cachable.request import Request
 from asyncio import AbstractEventLoop, new_event_loop
 from mincho import app_config
-from mincho.api.models import CurrentStats, Method
+from .models import Method, CurrentStats
 
 
 class ClientMeta(type):
@@ -27,13 +27,13 @@ class Client(object, metaclass=ClientMeta):
         self.__callback = callback
 
     def start(self):
-        self.eventLoop.create_task(self.api_processor())
-        self.eventLoop.run_forever()
+        self.eventLoop.run_until_complete(self.api_processor())
+
 
     async def api_processor(self):
         while True:
             method = self.input.get()
             result = await Request(method.value.replace("<client_id>", app_config.client_id)).json
-            match(method):
+            match method:
                 case Method.STATS:
-                    self.__callback(CurrentStats.from_dict(result))
+                    self.__callback(CurrentStats.from_dict(result).api_stats)
